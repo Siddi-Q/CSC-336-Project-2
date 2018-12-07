@@ -23,6 +23,7 @@ except ImportError:
 
     py3 = True
 
+
 import admin_doctor_window_support
 
 
@@ -59,16 +60,28 @@ class Toplevel1:
     def show_contact_info(self):
         try:
             patient_ssn = self.emergency_contact_info_patientID_textbox.get('1.0', 'end-1c')
-            show_contact_info_command = f"SELECT patientName, contactName, emergencyContactNumber " \
-                                        f"FROM patient p JOIN emergencycontact ec ON p.SSN = ec.SSN " \
-                                        f"AND ec.SSN = '{patient_ssn}' "
-            self.my_cursor.execute(show_contact_info_command)
-            list_contact_info = self.my_cursor.fetchall()
+            # show_contact_info_command = f"SELECT patientName, contactName, emergencyContactNumber " \
+            #                             f"FROM patient p JOIN emergencycontact ec ON p.SSN = ec.SSN " \
+            #                             f"AND ec.SSN = '{patient_ssn}' "
+            # self.my_cursor.execute(show_contact_info_command)
+            # list_contact_info = self.my_cursor.fetchall()
+            # i = 0
+            # self.emergency_contact_info_listbox.delete(0, self.emergency_contact_info_listbox.size())
+            # for row in list_contact_info:
+            #     self.emergency_contact_info_listbox.insert(i, row)
+            #     i += 1
+            self.my_cursor.callproc('showcontact', (patient_ssn,))
             i = 0
+
             self.emergency_contact_info_listbox.delete(0, self.emergency_contact_info_listbox.size())
+            for result in self.my_cursor.stored_results():
+                list_contact_info = result.fetchall()
             for row in list_contact_info:
                 self.emergency_contact_info_listbox.insert(i, row)
                 i += 1
+
+
+
         except Exception:
             messagebox.showerror('Error', "Error displaying patient's emergency contact info")
 
@@ -191,22 +204,13 @@ class Toplevel1:
         patient_address = self.patient_info_address_textbox.get('1.0', 'end-1c')
         patient_phone = self.Text5.get('1.0', 'end-1c')
         patient_enumber = self.patient_info_emergency_contact_phone_textbox.get('1.0', 'end-1c')
+        patient_ename = self.patient_emergencycontact_name_textbox.get('1.0', 'end-1c')
+        args = (patient_ssn, patient_name, patient_gender, patient_dob, patient_address, patient_phone, patient_enumber, patient_ename )
 
-        update_patient_command = f"UPDATE patient SET" \
-                                 f" patientName = '{patient_name}'," \
-                                 f" gender = '{patient_gender}'," \
-                                 f" dateOfBirth = '{patient_dob}'," \
-                                 f" address = '{patient_address}'," \
-                                 f" phoneNumber = '{patient_phone}'," \
-                                 f" emergencyContactNumber = '{patient_enumber}'" \
-                                 f" WHERE SSN = '{patient_ssn}' "
-
-        update_emergency_num_command = f"UPDATE emergencycontact SET phoneNumber = '{patient_enumber}' WHERE SSN = '{patient_ssn}' "
         try:
-            self.my_cursor.execute(update_patient_command)
+            self.my_cursor.callproc('updatepatientinfo', args)
             self.my_db.commit()
-            self.my_cursor.execute(update_emergency_num_command)
-            self.my_db.commit()
+
             messagebox.showinfo('Success', "You successfully updated patient info")
         except Exception:
             messagebox.showerror('Error changing',
@@ -231,7 +235,7 @@ class Toplevel1:
     def show_patient_records(self):
         patient_ssn = self.patient_records_patientID_textbox.get('1.0', 'end-1c')
         show_patient_record_command = f"SELECT pr.SSN, patientName, admissionDate," \
-                                      f"releaseDate, fees from patient p JOIN" \
+                                      f"releaseDate, fees FROM patient p JOIN" \
                                       f" patientrecord pr ON pr.SSN = p.SSN AND " \
                                       f"pr.SSN = '{patient_ssn}'"
         try:
@@ -889,13 +893,13 @@ class Toplevel1:
         self.patient_info_labelframe.configure(width=640)
 
         self.patient_information_patient_ssn_label = tk.Label(self.patient_info_labelframe)
-        self.patient_information_patient_ssn_label.place(relx=0.016, rely=0.108
+        self.patient_information_patient_ssn_label.place(relx=0.001, rely=0.108
                                                          , height=21, width=80, bordermode='ignore')
         self.patient_information_patient_ssn_label.configure(activebackground="#f9f9f9")
         self.patient_information_patient_ssn_label.configure(text='''Patient SSN''')
 
         self.patient_information_patientssn_textbox = tk.Text(self.patient_info_labelframe)
-        self.patient_information_patientssn_textbox.place(relx=0.141, rely=0.108
+        self.patient_information_patientssn_textbox.place(relx=0.117, rely=0.108
                                                           , relheight=0.13, relwidth=0.166, bordermode='ignore')
         self.patient_information_patientssn_textbox.configure(background="white")
         self.patient_information_patientssn_textbox.configure(font="TkTextFont")
@@ -912,13 +916,13 @@ class Toplevel1:
         self.Listbox3.configure(width=614)
 
         self.patient_info_fullname_label = tk.Label(self.patient_info_labelframe)
-        self.patient_info_fullname_label.place(relx=0.328, rely=0.108, height=21
+        self.patient_info_fullname_label.place(relx=0.29, rely=0.108, height=21
                                                , width=71, bordermode='ignore')
         self.patient_info_fullname_label.configure(activebackground="#f9f9f9")
         self.patient_info_fullname_label.configure(text='''Full Name''')
 
         self.patient_info_fullname_textbox = tk.Text(self.patient_info_labelframe)
-        self.patient_info_fullname_textbox.place(relx=0.438, rely=0.108
+        self.patient_info_fullname_textbox.place(relx=0.4, rely=0.108
                                                  , relheight=0.13, relwidth=0.213, bordermode='ignore')
         self.patient_info_fullname_textbox.configure(background="white")
         self.patient_info_fullname_textbox.configure(font="TkTextFont")
@@ -927,14 +931,14 @@ class Toplevel1:
         self.patient_info_fullname_textbox.configure(wrap='word')
 
         self.patient_info_DOB_label = tk.Label(self.patient_info_labelframe)
-        self.patient_info_DOB_label.place(relx=0.672, rely=0.108, height=21
+        self.patient_info_DOB_label.place(relx=0.630, rely=0.108, height=21
                                           , width=33, bordermode='ignore')
         self.patient_info_DOB_label.configure(activebackground="#f9f9f9")
         self.patient_info_DOB_label.configure(text='''DOB''')
 
         self.patient_info_DOB_textbox = tk.Text(self.patient_info_labelframe)
-        self.patient_info_DOB_textbox.place(relx=0.734, rely=0.108
-                                            , relheight=0.13, relwidth=0.134, bordermode='ignore')
+        self.patient_info_DOB_textbox.place(relx=0.684, rely=0.108
+                                            , relheight=0.13, relwidth=0.110, bordermode='ignore')
         self.patient_info_DOB_textbox.configure(background="white")
         self.patient_info_DOB_textbox.configure(font="TkTextFont")
         self.patient_info_DOB_textbox.configure(selectbackground="#c4c4c4")
@@ -942,7 +946,7 @@ class Toplevel1:
         self.patient_info_DOB_textbox.configure(wrap='word')
 
         self.patient_info_yyyymmdd_label = tk.Label(self.patient_info_labelframe)
-        self.patient_info_yyyymmdd_label.place(relx=0.734, rely=0.054, height=11
+        self.patient_info_yyyymmdd_label.place(relx=0.70, rely=0.054, height=11
                                                , width=61, bordermode='ignore')
         self.patient_info_yyyymmdd_label.configure(activebackground="#f9f9f9")
         self.patient_info_yyyymmdd_label.configure(font=font9)
@@ -964,13 +968,13 @@ class Toplevel1:
         self.patient_info_address_textbox.configure(wrap='word')
 
         self.patient_info_gender_label = tk.Label(self.patient_info_labelframe)
-        self.patient_info_gender_label.place(relx=0.375, rely=0.27, height=21
+        self.patient_info_gender_label.place(relx=0.79, rely=0.108, height=21
                                              , width=61, bordermode='ignore')
         self.patient_info_gender_label.configure(activebackground="#f9f9f9")
         self.patient_info_gender_label.configure(text='''Gender''')
 
         self.patient_info_gender_textbox = tk.Text(self.patient_info_labelframe)
-        self.patient_info_gender_textbox.place(relx=0.484, rely=0.27
+        self.patient_info_gender_textbox.place(relx=0.88, rely=0.108
                                                , relheight=0.13, relwidth=0.088, bordermode='ignore')
         self.patient_info_gender_textbox.configure(background="white")
         self.patient_info_gender_textbox.configure(font="TkTextFont")
@@ -979,19 +983,35 @@ class Toplevel1:
         self.patient_info_gender_textbox.configure(wrap='word')
 
         self.patient_info_phone_label = tk.Label(self.patient_info_labelframe)
-        self.patient_info_phone_label.place(relx=0.609, rely=0.27, height=21
+        self.patient_info_phone_label.place(relx=0.370, rely=0.27, height=21
                                             , width=59, bordermode='ignore')
         self.patient_info_phone_label.configure(activebackground="#f9f9f9")
         self.patient_info_phone_label.configure(text='''Phone #''')
 
+        # Phone textbox
         self.Text5 = tk.Text(self.patient_info_labelframe)
-        self.Text5.place(relx=0.703, rely=0.27, relheight=0.13, relwidth=0.181
+        self.Text5.place(relx=0.460, rely=0.27, relheight=0.13, relwidth=0.131
                          , bordermode='ignore')
         self.Text5.configure(background="white")
         self.Text5.configure(font="TkTextFont")
         self.Text5.configure(selectbackground="#c4c4c4")
         self.Text5.configure(width=116)
         self.Text5.configure(wrap='word')
+
+        self.patient_emergency_contact_name_label = tk.Label(self.patient_info_labelframe)
+        self.patient_emergency_contact_name_label.place(relx=0.60, rely=0.27, height=21
+                                            , width=85, bordermode='ignore')
+        self.patient_emergency_contact_name_label.configure(activebackground="#f9f9f9")
+        self.patient_emergency_contact_name_label.configure(text='''Contact Name''')
+
+        self.patient_emergencycontact_name_textbox = tk.Text(self.patient_info_labelframe)
+        self.patient_emergencycontact_name_textbox.place(relx=0.75, rely=0.27
+                                                 , relheight=0.13, relwidth=0.213, bordermode='ignore')
+        self.patient_emergencycontact_name_textbox.configure(background="white")
+        self.patient_emergencycontact_name_textbox.configure(font="TkTextFont")
+        self.patient_emergencycontact_name_textbox.configure(selectbackground="#c4c4c4")
+        self.patient_emergencycontact_name_textbox.configure(width=136)
+        self.patient_emergencycontact_name_textbox.configure(wrap='word')
 
         self.patient_info_emergency_contact_phone_label = tk.Label(self.patient_info_labelframe)
         self.patient_info_emergency_contact_phone_label.place(relx=0.016
