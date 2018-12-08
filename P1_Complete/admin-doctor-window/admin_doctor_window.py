@@ -60,16 +60,6 @@ class Toplevel1:
     def show_contact_info(self):
         try:
             patient_ssn = self.emergency_contact_info_patientID_textbox.get('1.0', 'end-1c')
-            # show_contact_info_command = f"SELECT patientName, contactName, emergencyContactNumber " \
-            #                             f"FROM patient p JOIN emergencycontact ec ON p.SSN = ec.SSN " \
-            #                             f"AND ec.SSN = '{patient_ssn}' "
-            # self.my_cursor.execute(show_contact_info_command)
-            # list_contact_info = self.my_cursor.fetchall()
-            # i = 0
-            # self.emergency_contact_info_listbox.delete(0, self.emergency_contact_info_listbox.size())
-            # for row in list_contact_info:
-            #     self.emergency_contact_info_listbox.insert(i, row)
-            #     i += 1
             self.my_cursor.callproc('showcontact', (patient_ssn,))
             i = 0
 
@@ -88,13 +78,13 @@ class Toplevel1:
     def show_diagnosis(self):
         try:
             patient_ssn = self.patient_diagnosis_patientID_textbox.get('1.0', 'end-1c')
-            show_contact_info_command = f"SELECT p.SSN, p.patientName, pd.diagnosisID, pd.diagnosisName, pd.dateOfDiagnosis " \
-                                        f"FROM patient p JOIN patientdiagnosis pd ON p.SSN = pd.SSN AND pd.SSN = '{patient_ssn}' "
-            self.my_cursor.execute(show_contact_info_command)
-            list_diagnosis = self.my_cursor.fetchall()
+            self.my_cursor.callproc('showdiagnosis', (patient_ssn,))
             i = 0
+
             self.patient_diagnosis_listbox.delete(0, self.patient_diagnosis_listbox.size())
-            for row in list_diagnosis:
+            for result in self.my_cursor.stored_results():
+                list_diagnosis_info = result.fetchall()
+            for row in list_diagnosis_info:
                 self.patient_diagnosis_listbox.insert(i, row)
                 i += 1
         except Exception:
@@ -105,14 +95,10 @@ class Toplevel1:
         diagnosis_name = self.patient_diagnosis_diagnosis_name_textbox.get('1.0', 'end-1c')
         diagnosis_Id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
         diagnosis_date = self.patient_diagnosis_diagnosis_date_textbox.get('1.0', 'end-1c')
-
-        update_diagnosis_command = f"UPDATE patientdiagnosis SET" \
-                                f" diagnosisName = '{diagnosis_name}'," \
-                                f" dateOfDiagnosis = '{diagnosis_date}'" \
-                                f" WHERE SSN = '{patient_ssn}' AND diagnosisID = '{diagnosis_Id}'"
+        args = (patient_ssn, diagnosis_Id, diagnosis_date, diagnosis_name)
 
         try:
-            self.my_cursor.execute(update_diagnosis_command)
+            self.my_cursor.callproc('updatediagnosis',args)
             self.my_db.commit()
             messagebox.showinfo('Update Diagnosis Success', "You successfully updated a patient's diagnosis")
         except Exception:
@@ -121,13 +107,14 @@ class Toplevel1:
     def submit_diagnosis(self):
         patient_ssn = self.patient_diagnosis_patientID_textbox.get('1.0', 'end-1c')
         diagnosis_name = self.patient_diagnosis_diagnosis_name_textbox.get('1.0', 'end-1c')
-        diagnosis_Id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
+        diagnosis_id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
         diagnosis_date = self.patient_diagnosis_diagnosis_date_textbox.get('1.0', 'end-1c')
+        args = (patient_ssn, diagnosis_id, diagnosis_name, diagnosis_date)
 
-        submit_diagnosis_command = f"INSERT INTO patientdiagnosis (SSN, diagnosisID, diagnosisName, dateOfDiagnosis) VALUES ('{patient_ssn}','{diagnosis_Id}','{diagnosis_name}','{diagnosis_date}')"
         try:
-            self.my_cursor.execute(submit_diagnosis_command)
+            self.my_cursor.callproc('insertdiagnosis', args)
             self.my_db.commit()
+
             messagebox.showinfo('Submit Diagnosis Success', "You successfully submitted a patient's new diagnosis")
         except Exception:
             messagebox.showerror('Error', "Error submitting patient's diagnosis")
