@@ -59,9 +59,9 @@ class Toplevel1:
         e_contact_num = self.EmergencyContactNumberText.get('1.0', 'end-1c')
         gender = self.GenderText.get('1.0', 'end-1c')
 
-        insert_patient = "INSERT IGNORE INTO patient (SSN, patientName, gender, dateOfBirth, address, phoneNumber, emergencyContactNumber) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        insert_patient = "INSERT INTO patient (SSN, patientName, gender, dateOfBirth, address, phoneNumber, emergencyContactNumber) VALUES (%s,%s,%s,%s,%s,%s,%s)"
         patient_info = (patient_ssn, patient_name, gender, dob, full_address, phone_number, e_contact_num)
-        insert_emergency_contact = "INSERT IGNORE INTO emergencycontact (SSN, contactName) VALUES (%s,%s)"
+        insert_emergency_contact = "INSERT INTO emergencycontact (SSN, contactName) VALUES (%s,%s)"
         emergency_contact_info = (patient_ssn, emergency_name)
         try:
             self.my_cursor.execute(insert_patient, patient_info)
