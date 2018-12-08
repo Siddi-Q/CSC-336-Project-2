@@ -12,26 +12,26 @@ CREATE TABLE `patient` (
   CREATE TABLE `emergencycontact` (
   `SSN` varchar(11) NOT NULL,
   `contactName` varchar(255) NOT NULL,
-  PRIMARY KEY (`SSN`,`contactName`),
+  PRIMARY KEY (`SSN`),
   CONSTRAINT `FK_SSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`SSN`));
  
  
 CREATE TABLE `diagnosisname` (
   `diagnosisID` varchar(255) NOT NULL,
   `diagnosisName` varchar(255) NOT NULL,
-  PRIMARY KEY (`diagnosisID`,`diagnosisName`));
+  PRIMARY KEY (`diagnosisID`));
   
   
 CREATE TABLE `drugtreatmentname` (
   `drugId` varchar(255) NOT NULL,
   `drugName` varchar(255) NOT NULL,
-  PRIMARY KEY (`drugId`,`drugName`));
+  PRIMARY KEY (`drugId`));
   
   
 CREATE TABLE `surgeryname` (
   `surgeryID` varchar(255) NOT NULL,
   `surgeryName` varchar(255) NOT NULL,
-  PRIMARY KEY (`surgeryID`,`surgeryName`));
+  PRIMARY KEY (`surgeryID`));
   
   
 CREATE TABLE `patientrecord` (
