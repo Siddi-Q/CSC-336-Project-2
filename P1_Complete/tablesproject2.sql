@@ -9,30 +9,12 @@ CREATE TABLE `patient` (
   PRIMARY KEY (`SSN`));
   
   
-  CREATE TABLE `emergencycontact` (
+CREATE TABLE `emergencycontact` (
   `SSN` varchar(11) NOT NULL,
   `contactName` varchar(255) NOT NULL,
   PRIMARY KEY (`SSN`),
   CONSTRAINT `FK_SSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`SSN`));
  
- 
-CREATE TABLE `diagnosisname` (
-  `diagnosisID` varchar(255) NOT NULL,
-  `diagnosisName` varchar(255) NOT NULL,
-  PRIMARY KEY (`diagnosisID`));
-  
-  
-CREATE TABLE `drugtreatmentname` (
-  `drugId` varchar(255) NOT NULL,
-  `drugName` varchar(255) NOT NULL,
-  PRIMARY KEY (`drugId`));
-  
-  
-CREATE TABLE `surgeryname` (
-  `surgeryID` varchar(255) NOT NULL,
-  `surgeryName` varchar(255) NOT NULL,
-  PRIMARY KEY (`surgeryID`));
-  
   
 CREATE TABLE `patientrecord` (
   `SSN` varchar(11) NOT NULL,
@@ -43,34 +25,51 @@ CREATE TABLE `patientrecord` (
   CONSTRAINT `FK_PRSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
   
   
-  CREATE TABLE `patientdiagnosis` (
+CREATE TABLE `patientdiagnosis` (
   `SSN` varchar(11) NOT NULL,
   `diagnosisID` varchar(255) NOT NULL,
-  `dateOfDiagnosis` date NOT NULL,
-  PRIMARY KEY (`SSN`,`diagnosisID`, `dateofDiagnosis`),
+  PRIMARY KEY (`diagnosisID`),
   CONSTRAINT `FK_PDSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
   
 
-  CREATE TABLE `patientdrugtreatment` (
+CREATE TABLE `patientdrugtreatment` (
   `SSN` varchar(11) NOT NULL,
-  `diagnosisID` varchar(255) NOT NULL,
-  `drugId` varchar(255) DEFAULT NULL,
-  `datePrescribed` date NOT NULL,
-  PRIMARY KEY (`SSN`,`diagnosisID`, `datePrescribed`),
-  CONSTRAINT `FK_PDRSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`),
-  CONSTRAINT `FK_PDRDIAGID` FOREIGN KEY (`diagnosisID`) REFERENCES `diagnosisname`(`diagnosisID`));
+  `drugId` varchar(255) NOT NULL,
+  PRIMARY KEY (`drugId`),
+  CONSTRAINT `FK_PDRSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
   
   
-  CREATE TABLE `patientsurgery` (
+CREATE TABLE `patientsurgery` (
   `SSN` varchar(11) NOT NULL,
   `surgeryID` varchar(255) NOT NULL,
-  `beginDate` date DEFAULT NULL,
-  `endDate` date DEFAULT NULL,
-  `results` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`SSN`,`surgeryID`),
+  PRIMARY KEY (`surgeryID`),
   CONSTRAINT `FK_PSSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
   
   
+CREATE TABLE `diagnosis` (
+  `diagnosisID` varchar(255) NOT NULL,
+  `diagnosisName` varchar(255) NOT NULL,
+  `dateOfDiagnosis` date NOT NULL,
+  PRIMARY KEY (`diagnosisName`, `dateOfDiagnosis`),
+  CONSTRAINT `FK_diagnosid` FOREIGN KEY (`diagnosisID`) REFERENCES `patientdiagnosis` (`diagnosisID`));
+  
+  
+CREATE TABLE `drugtreatment` (
+  `drugId` varchar(255) NOT NULL,
+  `drugName` varchar(255) NOT NULL,
+  `datePrescribed` date NOT NULL,
+  PRIMARY KEY (`drugName`,`datePrescribed`),
+  CONSTRAINT `FK_drugid` FOREIGN KEY (`drugId`) REFERENCES `patientdrugtreatment` (`drugId`));
+  
+  
+CREATE TABLE `surgery` (
+  `surgeryID` varchar(255) NOT NULL,
+  `surgeryName` varchar(255) NOT NULL,
+  `beginDate` date NOT NULL,
+  `endDate` date NOT NULL,
+  `results` varchar(255) NOT NULL,
+  PRIMARY KEY (`surgeryName`, `beginDate`),
+  CONSTRAINT `FK_surgeryid` FOREIGN KEY (`surgeryID`) REFERENCES `patientsurgery` (`surgeryID`));  
 
   
   
