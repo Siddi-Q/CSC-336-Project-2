@@ -234,13 +234,10 @@ class Toplevel1:
         patient_admission = self.patient_records_admission_date_textbox.get('1.0', 'end-1c')
         patient_release = self.patient_records_discharge_date_textbox.get('1.0', 'end-1c')
         patient_fees = self.patient_records_fee_textbox.get('1.0', 'end-1c')
-
-        update_command = f"UPDATE patientrecord SET" \
-                         f" admissionDate = '{patient_admission}', " \
-                         f"releaseDate = '{patient_release}'," \
-                         f" fees = '{patient_fees}' WHERE SSN = '{patient_ssn}' AND admissionDate = '{patient_admission}'"
+        args = (patient_ssn, patient_admission, patient_release, patient_fees)
         try:
-            self.my_cursor.execute(update_command)
+
+            self.my_cursor.callproc('updaterecords', args )
             self.my_db.commit()
             messagebox.showinfo('Success', "You successfully updated patient records")
         except Exception:
