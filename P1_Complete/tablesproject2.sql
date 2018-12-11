@@ -1,3 +1,8 @@
+drop table if exists patient, emergencycontact, patientrecord,
+ patientdiagnosis,
+ patientdrugtreatment, patientsurgery;
+
+
 CREATE TABLE `patient` (
   `ssn` VARCHAR(11) NOT NULL,
   `patientName` VARCHAR(255) NOT NULL,
