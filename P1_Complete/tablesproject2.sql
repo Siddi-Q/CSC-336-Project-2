@@ -1,76 +1,63 @@
 CREATE TABLE `patient` (
-  `SSN` varchar(11) NOT NULL,
-  `patientName` varchar(255) NOT NULL,
-  `gender` varchar(255) DEFAULT NULL,
-  `dateOfBirth` date DEFAULT NULL,
-  `address` varchar(255) DEFAULT NULL,
-  `phoneNumber` varchar(20) DEFAULT NULL,
-  `emergencyContactNumber` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`SSN`));
+  `ssn` VARCHAR(11) NOT NULL,
+  `patientName` VARCHAR(255) NOT NULL,
+  `gender` VARCHAR(255) NOT NULL,
+  `dateOfBirth` DATE NOT NULL,
+  `address` VARCHAR(255) NOT NULL,
+  `phoneNumber` VARCHAR(20) NOT NULL,
+  `emergencyContactNumber` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`ssn`));
   
   
 CREATE TABLE `emergencycontact` (
-  `SSN` varchar(11) NOT NULL,
-  `contactName` varchar(255) NOT NULL,
-  PRIMARY KEY (`SSN`),
-  CONSTRAINT `FK_SSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`SSN`));
+  `ssn` VARCHAR(11) NOT NULL,
+  `contactName` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`ssn`),
+  CONSTRAINT `FK_SSN` FOREIGN KEY (`ssn`) REFERENCES `patient` (`ssn`));
  
   
 CREATE TABLE `patientrecord` (
-  `SSN` varchar(11) NOT NULL,
-  `admissionDate` date NOT NULL,
-  `releaseDate` date DEFAULT NULL,
-  `fees` int DEFAULT NULL,
-  PRIMARY KEY (`SSN`,`admissionDate`),
-  CONSTRAINT `FK_PRSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
+  `ssn` VARCHAR(11) NOT NULL,
+  `admissionDate` DATE NOT NULL,
+  `releaseDate` DATE NOT NULL,
+  `fees` DOUBLE NOT NULL,
+  PRIMARY KEY (`ssn`,`admissionDate`),
+  CONSTRAINT `FK_PRSSN` FOREIGN KEY (`ssn`) REFERENCES `patient` (`ssn`));
   
   
 CREATE TABLE `patientdiagnosis` (
-  `SSN` varchar(11) NOT NULL,
-  `diagnosisID` varchar(255) NOT NULL,
+  `diagnosisID` INT NOT NULL AUTO_INCREMENT,
+  `ssn` VARCHAR(11) NOT NULL,
+  `diagnosisName` VARCHAR(255) NOT NULL, 
+  `dateOfDiagnosis` DATE NOT NULL,
   PRIMARY KEY (`diagnosisID`),
-  CONSTRAINT `FK_PDSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
+  CONSTRAINT `FK_PDSSN` FOREIGN KEY (`ssn`) REFERENCES `patient` (`ssn`), 
+  CONSTRAINT `UQ_Patient/Diagnosis/Day` UNIQUE KEY (`SSN`,`diagnosisName`, `dateOfDiagnosis`));
   
 
 CREATE TABLE `patientdrugtreatment` (
-  `SSN` varchar(11) NOT NULL,
-  `drugId` varchar(255) NOT NULL,
+  `drugID` INT NOT NULL AUTO_INCREMENT,
+  `ssn` VARCHAR(11) NOT NULL,
+  `drugName` VARCHAR(255) NOT NULL,
+  `datePrescribed` DATE NOT NULL,
+  `diagnosisID` INT NOT NULL,
   PRIMARY KEY (`drugId`),
-  CONSTRAINT `FK_PDRSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
+  CONSTRAINT `FK_PDRSSN` FOREIGN KEY (`ssn`) REFERENCES `patient` (`ssn`),
+  CONSTRAINT `UQ_Patient/DrugTreatment/Day` UNIQUE KEY (`ssn`,`drugName`, `datePrescribed`),
+  CONSTRAINT `FK_drugdiagnosis` FOREIGN KEY (`diagnosisID`) REFERENCES `patientdiagnosis` (`diagnosisID`));
   
   
 CREATE TABLE `patientsurgery` (
-  `SSN` varchar(11) NOT NULL,
-  `surgeryID` varchar(255) NOT NULL,
+  `surgeryID` INT NOT NULL AUTO_INCREMENT,
+  `ssn` VARCHAR(11) NOT NULL,
+  `surgeryName` VARCHAR(255) NOT NULL,
+  `beginDate` DATE NOT NULL,
+  `endDate` DATE NOT NULL,
+  `result` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`surgeryID`),
-  CONSTRAINT `FK_PSSSN` FOREIGN KEY (`SSN`) REFERENCES `patient` (`ssn`));
+  CONSTRAINT `FK_PSSSN` FOREIGN KEY (`ssn`) REFERENCES `patient` (`ssn`),
+  CONSTRAINT `UQ_Patient/DrugTreatment/Day` UNIQUE KEY (`ssn`,`surgeryName`, `beginDate`));
   
   
-CREATE TABLE `diagnosis` (
-  `diagnosisID` varchar(255) NOT NULL,
-  `diagnosisName` varchar(255) NOT NULL,
-  `dateOfDiagnosis` date NOT NULL,
-  PRIMARY KEY (`diagnosisName`, `dateOfDiagnosis`),
-  CONSTRAINT `FK_diagnosid` FOREIGN KEY (`diagnosisID`) REFERENCES `patientdiagnosis` (`diagnosisID`));
-  
-  
-CREATE TABLE `drugtreatment` (
-  `drugId` varchar(255) NOT NULL,
-  `drugName` varchar(255) NOT NULL,
-  `datePrescribed` date NOT NULL,
-  PRIMARY KEY (`drugName`,`datePrescribed`),
-  CONSTRAINT `FK_drugid` FOREIGN KEY (`drugId`) REFERENCES `patientdrugtreatment` (`drugId`));
-  
-  
-CREATE TABLE `surgery` (
-  `surgeryID` varchar(255) NOT NULL,
-  `surgeryName` varchar(255) NOT NULL,
-  `beginDate` date NOT NULL,
-  `endDate` date NOT NULL,
-  `results` varchar(255) NOT NULL,
-  PRIMARY KEY (`surgeryName`, `beginDate`),
-  CONSTRAINT `FK_surgeryid` FOREIGN KEY (`surgeryID`) REFERENCES `patientsurgery` (`surgeryID`));  
 
-  
-  
   
