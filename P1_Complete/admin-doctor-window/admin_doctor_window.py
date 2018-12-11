@@ -60,7 +60,7 @@ class Toplevel1:
     def show_contact_info(self):
         try:
             patient_ssn = self.emergency_contact_info_patientID_textbox.get('1.0', 'end-1c')
-            self.my_cursor.callproc('showcontact', (patient_ssn,))
+            self.my_cursor.callproc('showcontactinfo', (patient_ssn,))
             i = 0
 
             self.emergency_contact_info_listbox.delete(0, self.emergency_contact_info_listbox.size())
@@ -95,21 +95,20 @@ class Toplevel1:
         diagnosis_name = self.patient_diagnosis_diagnosis_name_textbox.get('1.0', 'end-1c')
         diagnosis_Id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
         diagnosis_date = self.patient_diagnosis_diagnosis_date_textbox.get('1.0', 'end-1c')
-        args = (patient_ssn, diagnosis_Id, diagnosis_date, diagnosis_name)
+        args = (patient_ssn,diagnosis_name, diagnosis_date, diagnosis_Id)
 
         try:
-            self.my_cursor.callproc('updatediagnosis',args)
+            self.my_cursor.callproc('updatediagnosis', args)
             self.my_db.commit()
             messagebox.showinfo('Update Diagnosis Success', "You successfully updated a patient's diagnosis")
         except Exception:
-            messagebox.showerror('Error', "Error updating patient's diagnosis")
+            messagebox.showerror('Error', "Error updating patient's diagnosis.")
 
     def submit_diagnosis(self):
         patient_ssn = self.patient_diagnosis_patientID_textbox.get('1.0', 'end-1c')
         diagnosis_name = self.patient_diagnosis_diagnosis_name_textbox.get('1.0', 'end-1c')
-        diagnosis_id = self.patient_diagnosis_diagnosisID_textbox.get('1.0', 'end-1c')
         diagnosis_date = self.patient_diagnosis_diagnosis_date_textbox.get('1.0', 'end-1c')
-        args = (patient_ssn, diagnosis_id, diagnosis_name, diagnosis_date)
+        args = (patient_ssn, diagnosis_name, diagnosis_date)
 
         try:
             self.my_cursor.callproc('insertdiagnosis', args)
@@ -139,7 +138,8 @@ class Toplevel1:
         drug_Id = self.patient_drug_treatment_drugID_textbox.get('1.0', 'end-1c')
         drug_Name = self.patient_drug_treatment_drug_name_textbox.get('1.0', 'end-1c')
         drug_Date = self.patient_drug_treatment_drugdate_textbox.get('1.0', 'end-1c')
-        args = (patient_ssn, drug_Id, drug_Name, drug_Date)
+        diag_id = self.patient_drug_treatment_diagId_textbox.get('1.0', 'end-1c')
+        args = (patient_ssn, drug_Name, drug_Date, drug_Id, diag_id)
 
         try:
 
@@ -147,15 +147,14 @@ class Toplevel1:
             self.my_db.commit()
             messagebox.showinfo('Update Drug Treatment Success', "You successfully updated a patient's drug treatment")
         except Exception:
-            messagebox.showerror('Error', "Error updating patient's diagnosis")
+            messagebox.showerror('Error', "Error updating patient's drug treatment")
 
     def submit_drug_treatment(self):
         patient_ssn = self.patient_drug_treament_patientssn_textbox.get('1.0', 'end-1c')
-
-        drug_Id = self.patient_drug_treatment_drugID_textbox.get('1.0', 'end-1c')
         drug_Name = self.patient_drug_treatment_drug_name_textbox.get('1.0', 'end-1c')
         drug_Date = self.patient_drug_treatment_drugdate_textbox.get('1.0', 'end-1c')
-        args = (patient_ssn, drug_Id, drug_Name, drug_Date)
+        diag_Id = self.patient_drug_treatment_diagId_textbox.get('1.0', 'end-1c')
+        args = (patient_ssn, drug_Name, drug_Date, diag_Id)
 
         try:
             self.my_cursor.callproc('insertdrugtreatment', args)
@@ -163,9 +162,6 @@ class Toplevel1:
             messagebox.showinfo('Submit Diagnosis Success', "You successfully submitted a patient's new drug treatment")
         except Exception:
             messagebox.showerror('Error', "Error submitting patient's drug treatment")
-
-
-
 
     def show_patient_info(self):
         try:
@@ -181,24 +177,24 @@ class Toplevel1:
             messagebox.showerror('Error', 'Error displaying patient info')
 
     def update_patient_info(self):
-        patient_ssn = self.patient_information_patientssn_textbox.get('1.0', 'end-1c')
-        patient_name = self.patient_info_fullname_textbox.get('1.0', 'end-1c')
-        patient_gender = self.patient_info_gender_textbox.get('1.0', 'end-1c')
-        patient_dob = self.patient_info_DOB_textbox.get('1.0', 'end-1c')
-        patient_address = self.patient_info_address_textbox.get('1.0', 'end-1c')
-        patient_phone = self.Text5.get('1.0', 'end-1c')
-        patient_enumber = self.patient_info_emergency_contact_phone_textbox.get('1.0', 'end-1c')
-        patient_ename = self.patient_emergencycontact_name_textbox.get('1.0', 'end-1c')
-        args = (patient_ssn, patient_name, patient_gender, patient_dob, patient_address, patient_phone, patient_enumber, patient_ename )
+        p_ssn = self.patient_information_patientssn_textbox.get('1.0', 'end-1c')
+        p_name = self.patient_info_fullname_textbox.get('1.0', 'end-1c')
+        p_gender = self.patient_info_gender_textbox.get('1.0', 'end-1c')
+        p_dob = self.patient_info_DOB_textbox.get('1.0', 'end-1c')
+        p_address = self.patient_info_address_textbox.get('1.0', 'end-1c')
+        p_phone = self.Text5.get('1.0', 'end-1c')
+        p_enumber = self.patient_info_emergency_contact_phone_textbox.get('1.0', 'end-1c')
+        p_ename = self.patient_emergencycontact_name_textbox.get('1.0', 'end-1c')
+        args = (p_ssn, p_name, p_gender, p_dob, p_address, p_phone, p_enumber, p_ename )
 
         try:
-            self.my_cursor.callproc('updatepatientinfo', args)
+            self.my_cursor.callproc('updatepatient', args)
             self.my_db.commit()
 
             messagebox.showinfo('Success', "You successfully updated patient info")
         except Exception:
             messagebox.showerror('Error changing',
-                                 'Please make sure you have re-entered all of the patient. Also you cannot modify SSN!')
+                                 'Error updating patient info!')
 
     def insert_patient_records(self):
         patient_ssn = self.patient_records_patientID_textbox.get('1.0', 'end-1c')
@@ -253,12 +249,11 @@ class Toplevel1:
 
     def insert_patient_surgery(self):
         patient_ssn = self.patient_surgeries_patient_ssn_textbox.get('1.0', 'end-1c')
-        surgery_id = self.patient_surgeries_surgeryID_textbox.get('1.0', 'end-1c')
         surgery_name = self.patient_surgeries_surgery_name_textbox.get('1.0', 'end-1c')
         begin_date = self.patient_surgeries_start_date_textbox.get('1.0', 'end-1c')
         end_date = self.patient_surgeries_end_date_textbox.get('1.0', 'end-1c')
         results = self.patient_surgeries_result_textbox.get('1.0', 'end-1c')
-        surgery_details = (patient_ssn, surgery_id, surgery_name, begin_date, end_date, results)
+        surgery_details = (patient_ssn, surgery_name, begin_date, end_date, results)
 
         try:
 
@@ -274,7 +269,7 @@ class Toplevel1:
         #                f" endDate, results FROM patient p JOIN patientsurgery s ON " \
         #                f"p.SSN = '{patient_ssn}' AND s.SSN = '{patient_ssn}'"
         try:
-            self.my_cursor.callproc('showsurgeries', (patient_ssn,))
+            self.my_cursor.callproc('showsurgery', (patient_ssn,))
             i = 0
 
             self.Listbox2.delete(0, self.Listbox2.size())
@@ -292,16 +287,10 @@ class Toplevel1:
         surgery_name = self.patient_surgeries_surgery_name_textbox.get('1.0', 'end-1c')
         begin_date = self.patient_surgeries_start_date_textbox.get('1.0', 'end-1c')
         end_date = self.patient_surgeries_end_date_textbox.get('1.0', 'end-1c')
-        results = self.patient_surgeries_result_textbox.get('1.0', 'end-1c')
-        surgery_details = (patient_ssn, surgery_id, surgery_name, begin_date, end_date, results)
-        # update_command = f"UPDATE patientsurgery SET " \
-        #                  f"surgeryID = '{surgery_id}', " \
-        #                  f"surgeryName = '{surgery_name}', " \
-        #                  f"beginDate = '{begin_date}', " \
-        #                  f"endDate = '{end_date}', " \
-        #                  f"results = '{results}' WHERE SSN = '{patient_ssn}' AND beginDate = '{begin_date}'"
+        result = self.patient_surgeries_result_textbox.get('1.0', 'end-1c')
+        surgery_details = (surgery_id,patient_ssn, surgery_name, begin_date, end_date, result)
         try:
-            self.my_cursor.callproc('updatesurgeries', surgery_details)
+            self.my_cursor.callproc('updatesurgery', surgery_details)
             self.my_db.commit()
             messagebox.showinfo('Success', "You successfully updated surgery info")
         except Exception:
@@ -331,7 +320,7 @@ class Toplevel1:
                 "italic -underline 0 -overstrike 0"
 
         top.geometry("1373x729+67+27")
-        top.title("New Toplevel")
+        top.title("Hospital Administrator Page")
         top.configure(background="#d6d6d6")
         top.configure(highlightcolor="black")
 
@@ -623,18 +612,18 @@ class Toplevel1:
                                                        , height=21, width=63, bordermode='ignore')
         self.patient_drug_treatment_drugID_label.configure(activebackground="#f9f9f9")
         self.patient_drug_treatment_drugID_label.configure(text='''Drug ID''')
+
+        self.patient_drug_treatment_diagID_label = tk.Label(self.patient_drug_treatment_labelframe)
+        self.patient_drug_treatment_diagID_label.place(relx=0.08, rely=0.286
+                                                       , height=21, width=68, bordermode='ignore')
+        self.patient_drug_treatment_diagID_label.configure(activebackground="#f9f9f9")
+        self.patient_drug_treatment_diagID_label.configure(text='''Diagnosis ID''')
         # Drug date label
         self.patient_drug_treatment_drugdate_label = tk.Label(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_drugdate_label.place(relx=0.65, rely=0.286
                                                        , height=21, width=100, bordermode='ignore')
         self.patient_drug_treatment_drugdate_label.configure(activebackground="#f9f9f9")
         self.patient_drug_treatment_drugdate_label.configure(text='''Date(YYYYMMDD)''')
-
-        # self.patient_drug_treatment_reason_label = tk.Label(self.patient_drug_treatment_labelframe)
-        # self.patient_drug_treatment_reason_label.place(relx=0.078
-        #                                                     , rely=0.286, height=21, width=86, bordermode='ignore')
-        # self.patient_drug_treatment_reason_label.configure(activebackground="#f9f9f9")
-        # self.patient_drug_treatment_reason_label.configure(text='''Reason''')
 
         self.patient_drug_treatment_submit_button = tk.Button(self.patient_drug_treatment_labelframe)
         self.patient_drug_treatment_submit_button.place(relx=0.656, rely=0.408
@@ -705,15 +694,15 @@ class Toplevel1:
         self.patient_drug_treatment_drugdate_textbox.configure(width=86)
         self.patient_drug_treatment_drugdate_textbox.configure(wrap='word')
 
-        # self.patient_drug_treatment_reason_textbox = tk.Text(self.patient_drug_treatment_labelframe)
-        # self.patient_drug_treatment_reason_textbox.place(relx=0.234
-        #                                                       , rely=0.286, relheight=0.098, relwidth=0.134
-        #                                                       , bordermode='ignore')
-        # self.patient_drug_treatment_reason_textbox.configure(background="white")
-        # self.patient_drug_treatment_reason_textbox.configure(font="TkTextFont")
-        # self.patient_drug_treatment_reason_textbox.configure(selectbackground="#c4c4c4")
-        # self.patient_drug_treatment_reason_textbox.configure(width=86)
-        # self.patient_drug_treatment_reason_textbox.configure(wrap='word')
+        self.patient_drug_treatment_diagId_textbox = tk.Text(self.patient_drug_treatment_labelframe)
+        self.patient_drug_treatment_diagId_textbox.place(relx=0.234
+                                                              , rely=0.286, relheight=0.098, relwidth=0.134
+                                                              , bordermode='ignore')
+        self.patient_drug_treatment_diagId_textbox.configure(background="white")
+        self.patient_drug_treatment_diagId_textbox.configure(font="TkTextFont")
+        self.patient_drug_treatment_diagId_textbox.configure(selectbackground="#c4c4c4")
+        self.patient_drug_treatment_diagId_textbox.configure(width=86)
+        self.patient_drug_treatment_diagId_textbox.configure(wrap='word')
 
         self.patient_surgeries_labelframe = tk.LabelFrame(top)
         self.patient_surgeries_labelframe.place(relx=0.015, rely=0.631
