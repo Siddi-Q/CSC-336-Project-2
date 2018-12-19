@@ -27,7 +27,7 @@ Recommended steps to take to using the software:
 * report any bugs/issues/needed improvements etc. 
 
 Significant Project Files:
-* export.sql
+* hospitalexport.sql
 
 Note: Use this file to recreate our hospital database onto your local machine
   
@@ -91,7 +91,7 @@ Button, Frame: Submit, Patient Diagnosis
 
 Description: This function will be executed once the Submit button, which is in the Patient Diagnosis frame, is pressed. This function will insert a patient's diagnosis information into the patientdiagnosis table.
 
-Constraints: Need to fill in all fields.
+Constraints: Need to fill in all fields, except ID which will automatically be assigned.
 
 Function Name: def show_drug_treatment(self)
 
@@ -109,7 +109,7 @@ Button, Frame: Update, Patient Drug Treatment
 
 Description: This function will be executed once the Update button, which is in the Patient Drug Treatment frame, is pressed. This function will update a patients drug treatment info.
 
-Constraints: Need to input a patients SSN and diagnosisId, both of which need to already exist in the table. You can't update either attribute with this function.
+Constraints: Need to input a patients SSN and drugId, both of which need to already exist in the table. You can't update either attribute with this function. Also, you need to enter an existing diagnosisID, patient cannot be given a drug treatment unless diagnosed with something.
 
 Function Name: def submit_drug_treatment(self)
 
@@ -123,7 +123,7 @@ Function Name: def show_patient_info(self)
 
 Button, Frame: Show Information, Patient Information
 
-Description: Takes patient SSN and displays full name, gender, dat of birth, address, phone number, and emergency contact phone number (all of which are in the 'patient' table)
+Description: Shows all patient's in the patient table. Displays full name, gender, dat of birth, address, phone number, and emergency contact phone number (all of which are in the 'patient' table)
 
 Output Format: (patient.SSN, patient.fullName, patient.gender, patient.dateOfBirth, patient.address, patient.phoneNumber, patient.emergencyContactNumber)
 
@@ -185,7 +185,11 @@ Button, Frame: Update, Patient Surgeries
 
 Description: takes input from user (patient ssn, surgery id, surgery name, begin date, end date, and results) and makes changes to the inputted attributes (besides ssn), if there are any to be made
 
-Constraints: Need to fill in all fields.
+* CONSTRAINTS FOR ALL UPDATES: 
+
+You can leave field's you do not desire to update blank. You cannot change the pre-assigned ID's as they are considered as event ID's, except in patient drug treatment where you are allowed to change the diagnosis id that corresponds to a patients drug treatment. 
+
+You need to enter an SSN and valid ID to update, even though a messagebox says you have successfully updated a field if you do not enter an existing SSN/ID, the database made no changes because it did not find an existing value to update. 
 
 * app.py
 
@@ -197,3 +201,24 @@ Constraints: Need to fill in all fields.
 
   * Adjust the app.config['MYSQL_DATABASE_USER'], app.config['MYSQL_DATABASE_PASSWORD'] etc. to your preferred settings/values.
    
+  
+  *TRIGGERS: 
+  
+  For every date attribute in this database, there is a trigger that automatically changes the date to the current date if a user  
+  attempts to input a future date. This logically makes sense since it would be a corrupt system if you could enter future values.
+  
+  *3NF:
+  
+  The ID's in this database are not specific ID's that correspond to a specific drug, diagnosis, surgery, etc. These ID's should be 
+  thought of as an "event ID". These ID's are unique and identify the specific event for a specfic patient. 
+  
+  A Unique constraint was put on (SSN, event name, date) specifically so a user could not enter the same thing on the same day, as it 
+  can only logically happen once in a hospital. For example, you aren't prescribed excedrin twice on the same day because you were 
+  diagnosed with a headache. This constraint works in such a way that two people can be diagnosed with the same thing on the same day.
+  Essentially, values can be repeated, but NOT all at the same time. 
+  
+  
+  
+  
+  on 
+  
